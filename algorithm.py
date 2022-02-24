@@ -8,16 +8,22 @@ class Algorithm():
         self.working_people = np.zeros(len(projects_dict))
 
     def update_available_people(self):
-        pass
+
 
     def sort_projects_by_effective_score_desc(self):
         pass
 
     def sort_skills_of_k_projects(self, top_k_projects):
-        pass
+        skill_list = []
+        for project in top_k_projects:
+            skill_list += project.skills
+
+        return sorted(skill_list, key=lambda skill: skill[1])
 
     def find_fitting_person(self, skill):
-        pass
+
+
+
 
     def set_working_people(self, project):
         pass
