@@ -26,12 +26,13 @@ class Algorithm():
         return sorted(skill_list, key=lambda skill: skill[1])
 
     def find_fitting_person(self, skill):
-
+        pass
 
 
 
     def set_working_people(self, project):
-        pass
+        for persons in projects.working_persons:
+            self.available_people[persons.idx] = 0
 
     def remove_project(self, project):
         pass
