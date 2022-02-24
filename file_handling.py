@@ -3,6 +3,7 @@ import argparse
 
 from random import shuffle
 from pprint import pprint
+from collections import defaultdict
 
 
 def write_file():
@@ -29,24 +30,39 @@ def load_example(example_letter):
 
 
 def load_file(file_name):
-    input_path = os.path.join('input', file_name + ".txt")
+    input_path = os.path.join('..', 'inputs', file_name + ".txt")
 
+    contributors_dict = dict()
+    skills_set = set()
+    projects_dict = dict()
     with open(input_path, 'r') as f:
-        total = int(f.readline())
-        for i in range(total):
-            pass
-            # like_line = f.readline().rstrip('\n')
-            # dislike_line = f.readline().rstrip('\n')
-            #
-            # like_ingr = like_line.split(' ')[1:]
-            # dislike_ingr = dislike_line.split(' ')[1:]
-            #
-            # customers.append({
-            #     'like': set(like_ingr),
-            #     'dislike': set(dislike_ingr)
-            # })
-
-    return 0
+        contributors_num, projects_num = [int(n) for n in f.readline().rstrip('\n').split(' ')]
+        for c in range(contributors_num):
+            contributor_name, contributor_skill_num = f.readline().rstrip('\n').split(' ')
+            contributor_skill_num = int(contributor_skill_num)
+            skills_dict = defaultdict(lambda: 0)
+            for s in range(contributor_skill_num):
+                skill_name, skill_level = f.readline().rstrip('\n').split(' ')
+                skill_level = int(skill_level)
+                skills_dict[skill_name] = skill_level
+                skills_set.add(skill_name)
+            contributors_dict[contributor_name] = skills_dict
+        for p in range(projects_num):
+            project_name, project_days, project_score, project_best_before, project_number_of_roles = f.readline().rstrip(
+                '\n').split(' ')
+            project_days, project_score, project_best_before, project_number_of_roles = int(project_days), int(
+                project_score), int(project_best_before), int(project_number_of_roles)
+            project_skills_list = []
+            for r in range(project_number_of_roles):
+                skill_name, skill_level = f.readline().rstrip('\n').split(' ')
+                skill_level = int(skill_level)
+                project_skills_list.append((skill_name, skill_level))
+            projects_dict[project_name] = {'project_days': project_days,
+                                           'project_score': project_score,
+                                           'project_best_before': project_best_before,
+                                           'project_number_of_roles': project_number_of_roles,
+                                           'project_skills_list': project_skills_list}
+    return contributors_dict, projects_dict, skills_set
 
 
 def main():
