@@ -42,7 +42,10 @@ class Algorithm():
             self.available_people[persons.idx] = 0
 
     def remove_project(self, project):
-        pass
+        running_projects.remove(project)
+
+    def add_project(self, project):
+        running_projects.add(project)
 
     def calculate(self, top_k=1):
         self.time = 0
