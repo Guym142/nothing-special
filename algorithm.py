@@ -1,4 +1,5 @@
 import numpy as np
+from project import Project
 from file_handling import write_file
 
 
@@ -7,18 +8,20 @@ class Algorithm:
         self.example = example
         self.time = 0
         self.schedule = []
-        self.projects = set(projects_dict.values())
+        self.projects = set([Project(name, p) for name, p in projects_dict.items()])
 
         self.write_every = write_every
         self.available_people = np.ones(projects_dict)
         self.running_projects = set()
 
     def update_available_people(self):
-        for running_project in running_projects:
-            if (running_project.days == 0):
+        for running_project in self.running_projects:
+            running_project.days -= 1
+            if running_project.days == 0:
                 for working_person in running_project.working_persons:
                     person_idx = working_person.idx
                     self.available_people[person_idx] = 1
+                self.running_projects.remove(running_project)
 
     def sort_projects_by_effective_score_desc(self):
         return sorted(self.projects, key=lambda p: min(0, p.best_before - (self.time + p.days)))
@@ -40,16 +43,10 @@ class Algorithm:
         return self.people.person_by_index(selected_person_idx)
 
     def set_working_people(self, project):
-        for persons in projects.working_persons:
-            self.available_people[persons.idx] = 0
+        for person in project.persons_in_project:
+            self.available_people[person.idx] = 0
 
-    def remove_project(self, project):
-        running_projects.remove(project)
-
-    def add_project(self, project):
-        running_projects.add(project)
-
-    def calculate(self, top_k=1):
+    def calculate(self, top_k=1, iters=1):
         self.schedule = []
         self.time = 0
 
@@ -60,22 +57,24 @@ class Algorithm:
             if len(sorted_projects):
                 break
 
-            top_k_projects = sorted_projects[:top_k]
+            for i in range(min(iters, len(sorted_projects) // top_k)):
+                top_k_projects = sorted_projects[i*top_k:(i+1)*top_k]
+                sorted_skills = self.sort_skills_of_k_projects(top_k_projects)  # {name, level, project}
 
-            sorted_skills = self.sort_skills_of_k_projects(top_k_projects)  # {name, level, project}
+                for skill in sorted_skills:
+                    person = self.find_fitting_person(skill)
+                    skill.projects.add_person(person)
 
-            for skill in sorted_skills:
-                person = self.find_fitting_person(skill)
-                skill.projects.add_person(person)
+                for project in top_k_projects:
+                    if project.is_full():
+                        self.schedule.append(project)
+                        self.running_projects.add(project)
 
-            for project in top_k_projects:
-                if project.is_full():
-                    self.schedule.append(project)
-                    self.set_working_people(project)
-                    project.add_one_to_peoples_skills()
-                    self.remove_project(project)
-                else:
-                    project.clean()
+                        self.set_working_people(project)
+                        project.add_one_to_peoples_skills()
+                        self.projects.remove(project)
+                    else:
+                        project.clean()
 
             if (self.time + 1) % self.write_every == 0:
                 write_file(self.schedule, self.example)

@@ -11,7 +11,7 @@ def write_file(schedule, example):
 
     for project in schedule:
         output_lines.append(project.name)
-        output_lines.append(' '.join(project.get_people()))
+        output_lines.append(' '.join([p.name for p in project.persons_in_project]))
 
     output = '\n'.join(output_lines)
 
