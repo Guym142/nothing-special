@@ -8,24 +8,36 @@ class Algorithm:
         self.time = 0
         self.schedule = []
         self.projects = set(projects_dict.values())
-        self.working_people = np.zeros(len(projects_dict))
+
         self.write_every = write_every
+        self.available_people = np.ones(projects_dict)
 
     def update_available_people(self):
-        pass
+        for running_project in running_projects:
+            if (running_project.days == 0):
+                for working_person in running_project.working_persons:
+                    person_idx = working_person.idx
+                    self.available_people[person_idx] = 1
 
     def sort_projects_by_effective_score_desc(self):
 
         pass
 
     def sort_skills_of_k_projects(self, top_k_projects):
-        pass
+        skill_list = []
+        for project in top_k_projects:
+            skill_list += project.skills
+
+        return sorted(skill_list, key=lambda skill: skill[1])
 
     def find_fitting_person(self, skill):
         pass
 
+
+
     def set_working_people(self, project):
-        pass
+        for persons in projects.working_persons:
+            self.available_people[persons.idx] = 0
 
     def remove_project(self, project):
         pass
