@@ -20,8 +20,7 @@ class Algorithm:
                     self.available_people[person_idx] = 1
 
     def sort_projects_by_effective_score_desc(self):
-
-        pass
+        return sorted(self.projects, key=lambda p: min(0, p.best_before - (self.time + p.days)))
 
     def sort_skills_of_k_projects(self, top_k_projects):
         skill_list = []
@@ -32,8 +31,6 @@ class Algorithm:
 
     def find_fitting_person(self, skill):
         pass
-
-
 
     def set_working_people(self, project):
         for persons in projects.working_persons:
