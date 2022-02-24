@@ -17,11 +17,12 @@ def write_file():
 
 def load_example(example_letter):
     examples = {
-        'a': '',
-        'b': '',
-        'c': '',
-        'd': '',
-        'e': '',
+        'a': 'an_example.in',
+        'b': 'b_better_start_small.in',
+        'c': 'c_collaboration.in',
+        'd': 'd_dense_schedule.in',
+        'e': 'e_exceptional_skills.in.txt',
+        'f': 'f_find_great_mentors.in.txt'
     }
 
     file_name = examples[example_letter]
