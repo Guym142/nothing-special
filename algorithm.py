@@ -11,6 +11,7 @@ class Algorithm:
 
         self.write_every = write_every
         self.available_people = np.ones(projects_dict)
+        self.running_projects = set()
 
     def update_available_people(self):
         for running_project in running_projects:
@@ -30,14 +31,23 @@ class Algorithm:
         return sorted(skill_list, key=lambda skill: skill[1])
 
     def find_fitting_person(self, skill):
-        pass
+        skill_idx = self.people.skill_index(skill)  # return skill index
+        available_people = self.people[:, self.available_people]
+        relevant_people = available_people[:, available_people[skill_idx, :] > skill[1]]
+        effective_skills = np.divide(relevant_people[skill_idx, :], sum(relevant_people, axis=1))
+
+        selected_person_idx = np.argmin(effective_skills)
+        return self.people.person_by_index(selected_person_idx)
 
     def set_working_people(self, project):
         for persons in projects.working_persons:
             self.available_people[persons.idx] = 0
 
     def remove_project(self, project):
-        pass
+        running_projects.remove(project)
+
+    def add_project(self, project):
+        running_projects.add(project)
 
     def calculate(self, top_k=1):
         self.schedule = []
