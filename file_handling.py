@@ -7,7 +7,7 @@ from collections import defaultdict
 
 
 def write_file(schedule, example):
-    output_lines = [len(schedule)]
+    output_lines = [str(len(schedule))]
 
     for project in schedule:
         output_lines.append(project.name)

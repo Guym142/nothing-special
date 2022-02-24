@@ -9,17 +9,17 @@ from person import Person
 
 
 class Algorithm:
-    def __init__(self, persons_dict, projects_dict, skills_set, example, write_every=10):
+    def __init__(self, persons_dict, projects_dict, skills_set, example, write_every=1):
         self.example = example
         self.time = 0
         self.schedule = []
         self.projects = set([Project(name, p) for name, p in projects_dict.items()])
         person_list = []
-        for people_name, skills_dict in persons_dict:
+        for people_name, skills_dict in persons_dict.items():
             person_list.append(Person(people_name, skills_dict))
         self.people = People(person_list, skills_set)
         self.write_every = write_every
-        self.available_people = np.ones(projects_dict)
+        self.available_people = np.ones(len(projects_dict), dtype=bool)
         self.running_projects = set()
 
     def update_available_people(self):
@@ -43,12 +43,15 @@ class Algorithm:
 
     def find_fitting_person(self, skill):
 
-        available_people = self.people.mat.loc[self.available_people]
-        relevant_people = available_people.loc[available_people[skill[0], :] > skill[1]]
-        effective_skills = np.divide(relevant_people.iloc[skill[0]], relevant_people.sum(axis=1))
-        selected_person = effective_skills.argmin()
+        tmp = self.people.mat.loc[self.available_people]
+        relevant_people = tmp.loc[tmp[skill[0]] > skill[1]]
+        if len(relevant_people) == 0:
+            return None
 
-        return self.people.name_to_person(selected_person)
+        # effective_skills = np.divide(relevant_people[skill[0]], relevant_people.sum(axis=1))
+        # selected_person = effective_skills.argmin()
+        bla = relevant_people.iloc[0].index
+        return self.people.name_to_person(bla)
 
     def set_working_people(self, project):
         for person in project.persons_in_project:
@@ -71,7 +74,9 @@ class Algorithm:
 
                 for skill in sorted_skills:
                     person = self.find_fitting_person(skill)
-                    skill.projects.add_person(person)
+                    if person is None:
+                        continue
+                    skill[2].add_person(person)
 
                 for project in top_k_projects:
                     if project.is_full():
@@ -97,9 +102,9 @@ def main():
     parser.add_argument("-e", "--example", help="Example Letter", type=str)
     args = parser.parse_args()
 
-    example = args.example
+    example = 'a' # args.example
 
-    people_dict, projects_dict, skills_set = load_example(args.example)
+    people_dict, projects_dict, skills_set = load_example(example)
 
     Algorithm(people_dict, projects_dict, skills_set, example).calculate()
     print("done!")
