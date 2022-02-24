@@ -6,9 +6,14 @@ class Algorithm():
         self.time = 0
         self.projects = set(projects_dict.values())
         self.working_people = np.zeros(len(projects_dict))
+        self.available_people = np.ones(projects_dict)
 
     def update_available_people(self):
-
+        for running_project in running_projects:
+            if(running_project.days == 0):
+                for working_person in running_project.working_persons:
+                    person_idx = working_person.idx
+                    self.available_people[person_idx] = 1
 
     def sort_projects_by_effective_score_desc(self):
         pass
