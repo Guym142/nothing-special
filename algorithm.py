@@ -1,6 +1,7 @@
 import numpy as np
 from project import Project
-from file_handling import write_file
+from file_handling import write_file, load_example
+import argparse
 
 
 class Algorithm:
@@ -54,7 +55,7 @@ class Algorithm:
             self.update_available_people()
 
             sorted_projects = self.sort_projects_by_effective_score_desc()  # also remove 0 scores
-            if len(sorted_projects):
+            if len(sorted_projects) == 0:
                 break
 
             for i in range(min(iters, len(sorted_projects) // top_k)):
@@ -82,3 +83,20 @@ class Algorithm:
             self.time += 1
 
         return self.schedule
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--example", help="Example Letter", type=str)
+    args = parser.parse_args()
+
+    example = args.example
+
+    people_dict, projects_dict, skills_set = load_example(args.example)
+
+    Algorithm(people_dict, projects_dict, skills_set, example).calculate()
+    print("done!")
+
+
+if __name__ == "__main__":
+    main()
