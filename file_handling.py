@@ -6,18 +6,25 @@ from pprint import pprint
 from collections import defaultdict
 
 
-def write_file():
-    output = f""
+def write_file(schedule, example):
+    output_lines = [len(schedule)]
+
+    for project in schedule:
+        output_lines.append(project.name)
+        output_lines.append(' '.join(project.get_people()))
+
+    output = '\n'.join(output_lines)
+
     if not os.path.exists('outputs'):
         os.makedirs('outputs')
-    file_path = os.path.join('outputs', f'.txt')
+    file_path = os.path.join('outputs', f'{example}_{len(schedule)}.txt')
     with open(file_path, 'w') as f:
         f.write(output)
 
 
 def load_example(example_letter):
     examples = {
-        'a': 'an_example.in',
+        'a': 'a_an_example.in',
         'b': 'b_better_start_small.in',
         'c': 'c_collaboration.in',
         'd': 'd_dense_schedule.in',
@@ -31,7 +38,7 @@ def load_example(example_letter):
 
 
 def load_file(file_name):
-    input_path = os.path.join('..', 'inputs', file_name + ".txt")
+    input_path = os.path.join('inputs', file_name + ".txt")
 
     contributors_dict = dict()
     skills_set = set()
@@ -49,8 +56,8 @@ def load_file(file_name):
                 skills_set.add(skill_name)
             contributors_dict[contributor_name] = skills_dict
         for p in range(projects_num):
-            project_name, project_days, project_score, project_best_before, project_number_of_roles = f.readline().rstrip(
-                '\n').split(' ')
+            project_name, project_days, project_score, project_best_before, project_number_of_roles = f.readline() \
+                .rstrip('\n').split(' ')
             project_days, project_score, project_best_before, project_number_of_roles = int(project_days), int(
                 project_score), int(project_best_before), int(project_number_of_roles)
             project_skills_list = []
@@ -70,7 +77,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--example", help="Example Letter", type=str)
     args = parser.parse_args()
-    print(args.example)
+
+    people_dict, projects_dict, skills_set = load_example(args.example)
+
+    pprint(people_dict)
 
 
 if __name__ == "__main__":
