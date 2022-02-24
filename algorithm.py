@@ -1,14 +1,20 @@
 import numpy as np
+
+from People import People
 from file_handling import write_file
+from person import Person
 
 
 class Algorithm:
-    def __init__(self, people_dict, projects_dict, example, write_every=10):
+    def __init__(self, persons_dict, projects_dict, skills_set, example, write_every=10):
         self.example = example
         self.time = 0
         self.schedule = []
         self.projects = set(projects_dict.values())
-
+        person_list = []
+        for people_name, skills_dict in persons_dict:
+            person_list.append(Person(people_name, skills_dict))
+        self.people = People(person_list, skills_set)
         self.write_every = write_every
         self.available_people = np.ones(projects_dict)
 
@@ -31,9 +37,13 @@ class Algorithm:
         return sorted(skill_list, key=lambda skill: skill[1])
 
     def find_fitting_person(self, skill):
-        pass
 
+        available_people = self.people.mat.loc[self.available_people]
+        relevant_people = available_people.loc[available_people[skill[0], :] > skill[1]]
+        effective_skills = np.divide(relevant_people.iloc[skill[0]], relevant_people.sum(axis=1))
+        selected_person = effective_skills.argmin()
 
+        return self.people.name_to_person(selected_person)
 
     def set_working_people(self, project):
         for persons in projects.working_persons:
