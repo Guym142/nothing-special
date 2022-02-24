@@ -7,6 +7,7 @@ class Algorithm():
         self.projects = set(projects_dict.values())
         self.working_people = np.zeros(len(projects_dict))
         self.available_people = np.ones(projects_dict)
+        self.running_projects = set()
 
     def update_available_people(self):
         for running_project in running_projects:
@@ -26,7 +27,13 @@ class Algorithm():
         return sorted(skill_list, key=lambda skill: skill[1])
 
     def find_fitting_person(self, skill):
-        pass
+        skill_idx = self.people.skill_index(skill)  # return skill index
+        available_people = self.people[:, self.available_people]
+        relevant_people = available_people[:, available_people[skill_idx, :] > skill[1]]
+        effective_skills = np.divide(relevant_people[skill_idx, :], sum(relevant_people, axis=1))
+
+        selected_person_idx = np.argmin(effective_skills)
+        return self.people.person_by_index(selected_person_idx)
 
 
 
