@@ -3,14 +3,21 @@ from project import Project
 from file_handling import write_file, load_example
 import argparse
 
+from People import People
+from file_handling import write_file
+from person import Person
+
 
 class Algorithm:
-    def __init__(self, people_dict, projects_dict, example, write_every=10):
+    def __init__(self, persons_dict, projects_dict, skills_set, example, write_every=10):
         self.example = example
         self.time = 0
         self.schedule = []
         self.projects = set([Project(name, p) for name, p in projects_dict.items()])
-
+        person_list = []
+        for people_name, skills_dict in persons_dict:
+            person_list.append(Person(people_name, skills_dict))
+        self.people = People(person_list, skills_set)
         self.write_every = write_every
         self.available_people = np.ones(projects_dict)
         self.running_projects = set()
@@ -35,13 +42,13 @@ class Algorithm:
         return sorted(skill_list, key=lambda skill: skill[1])
 
     def find_fitting_person(self, skill):
-        skill_idx = self.people.skill_index(skill)  # return skill index
-        available_people = self.people[:, self.available_people]
-        relevant_people = available_people[:, available_people[skill_idx, :] > skill[1]]
-        effective_skills = np.divide(relevant_people[skill_idx, :], sum(relevant_people, axis=1))
 
-        selected_person_idx = np.argmin(effective_skills)
-        return self.people.person_by_index(selected_person_idx)
+        available_people = self.people.mat.loc[self.available_people]
+        relevant_people = available_people.loc[available_people[skill[0], :] > skill[1]]
+        effective_skills = np.divide(relevant_people.iloc[skill[0]], relevant_people.sum(axis=1))
+        selected_person = effective_skills.argmin()
+
+        return self.people.name_to_person(selected_person)
 
     def set_working_people(self, project):
         for person in project.persons_in_project:
