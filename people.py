@@ -11,7 +11,7 @@ class People:
         self.skills_list = list(skills_set)
         self.persons_names = [p.name for p in people]
         self.person_to_ind_dict = {p: i for i, p in enumerate(self.persons_names)}
-        temp_list =[]
+        temp_list = []
         for p in people:
             temp_list.append(self._skills_dict_to_list(p.skills))
         self.mat = pd.DataFrame(temp_list,

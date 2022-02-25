@@ -6,18 +6,18 @@ from pprint import pprint
 from collections import defaultdict
 
 
-def write_file(schedule, example):
+def write_file(schedule, example, score):
     output_lines = [str(len(schedule))]
 
     for project in schedule:
         output_lines.append(project.name)
-        output_lines.append(' '.join([p.name for p in project.persons_in_project]))
+        output_lines.append(' '.join(project.get_contributors_names_in_order()))
 
     output = '\n'.join(output_lines)
 
     if not os.path.exists('outputs'):
         os.makedirs('outputs')
-    file_path = os.path.join('outputs', f'{example}_{len(schedule)}.txt')
+    file_path = os.path.join('outputs', f'{example}_len={len(schedule)}_score={score}.txt')
     with open(file_path, 'w') as f:
         f.write(output)
 
@@ -28,8 +28,8 @@ def load_example(example_letter):
         'b': 'b_better_start_small.in',
         'c': 'c_collaboration.in',
         'd': 'd_dense_schedule.in',
-        'e': 'e_exceptional_skills.in.txt',
-        'f': 'f_find_great_mentors.in.txt'
+        'e': 'e_exceptional_skills.in',
+        'f': 'f_find_great_mentors.in'
     }
 
     file_name = examples[example_letter]

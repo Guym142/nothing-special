@@ -7,11 +7,16 @@ class Project:
         self.days = project_dict['days']
         self.score = project_dict['score']
         self.best_before = project_dict['best_before']
-        self.skills = project_dict['roles']
+        self.skills = project_dict['skills']
 
-        self.skills_assignment = {}
+        self.effective_score = None
+
+        self.skills_assignment = {} # keeps order
         self.contributors_set = set()
         self.clean()
+
+    def update_effective_score(self, time):
+        self.effective_score = self.score - min(0, self.best_before - (time + self.days))
 
     def _is_fit_for_assignment(self, person: Person, skill):
         person_level = person.skills[skill]
@@ -59,3 +64,6 @@ class Project:
     def clean(self):
         self.skills_assignment = dict.fromkeys(self.skills.keys())
         self.contributors_set = set()
+
+    def get_contributors_names_in_order(self):
+        return [cont.name for cont in self.skills_assignment.values()]
