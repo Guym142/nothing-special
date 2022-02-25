@@ -41,35 +41,54 @@ def load_file(file_name):
     input_path = os.path.join('inputs', file_name + ".txt")
 
     contributors_dict = dict()
-    skills_set = set()
     projects_dict = dict()
+    skills_set = set()
+
     with open(input_path, 'r') as f:
+        # first line of file
         contributors_num, projects_num = [int(n) for n in f.readline().rstrip('\n').split(' ')]
+
+        # contributors (people)
         for c in range(contributors_num):
-            contributor_name, contributor_skill_num = f.readline().rstrip('\n').split(' ')
-            contributor_skill_num = int(contributor_skill_num)
-            skills_dict = defaultdict(lambda: 0)
-            for s in range(contributor_skill_num):
-                skill_name, skill_level = f.readline().rstrip('\n').split(' ')
-                skill_level = int(skill_level)
+            # contributor first line
+            cont_first_line = f.readline().rstrip('\n').split(' ')
+            cont_name, cont_skill_num = cont_first_line[0], int(cont_first_line[1])
+
+            # contributor's skills
+            skills_dict = defaultdict(int)
+            for s in range(cont_skill_num):
+                skill_line = f.readline().rstrip('\n').split(' ')
+                skill_name, skill_level = skill_line[0], int(skill_line[1])
+
                 skills_dict[skill_name] = skill_level
                 skills_set.add(skill_name)
-            contributors_dict[contributor_name] = skills_dict
+
+            # append contributor
+            contributors_dict[cont_name] = skills_dict
+
+        # projects
         for p in range(projects_num):
-            project_name, project_days, project_score, project_best_before, project_number_of_roles = f.readline() \
-                .rstrip('\n').split(' ')
-            project_days, project_score, project_best_before, project_number_of_roles = int(project_days), int(
-                project_score), int(project_best_before), int(project_number_of_roles)
-            project_skills_list = []
+            project_first_line = f.readline().rstrip('\n').split(' ')
+            project_name, project_days, project_score, project_best_before, project_number_of_roles = \
+                project_first_line[0], int(project_first_line[1]), int(project_first_line[2]), \
+                int(project_first_line[3]), int(project_first_line[4])
+
+            # project's roles
+            project_roles_list = []
             for r in range(project_number_of_roles):
-                skill_name, skill_level = f.readline().rstrip('\n').split(' ')
-                skill_level = int(skill_level)
-                project_skills_list.append((skill_name, skill_level))
-            projects_dict[project_name] = {'project_days': project_days,
-                                           'project_score': project_score,
-                                           'project_best_before': project_best_before,
-                                           'project_number_of_roles': project_number_of_roles,
-                                           'project_skills_list': project_skills_list}
+                role_line = f.readline().rstrip('\n').split(' ')
+                skill_name, skill_level = role_line[0], int(role_line[1])
+
+                project_roles_list.append((skill_name, skill_level))
+
+            # append project
+            projects_dict[project_name] = {
+                'days': project_days,
+                'score': project_score,
+                'best_before': project_best_before,
+                'roles': project_roles_list
+            }
+
     return contributors_dict, projects_dict, skills_set
 
 
