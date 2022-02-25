@@ -29,8 +29,8 @@ class Algorithm:
     def update_ending_projects(self):
         ending_projects = []
         for running_project in self.running_projects:
-            running_project.days -= 1
-            if running_project.days == 0:
+            running_project.days -= self.time_step
+            if running_project.days <= 0:
                 for working_person in running_project.contributors_set:
                     person_idx = working_person.idx
                     self.available_people_indicator[person_idx] = True
@@ -49,7 +49,10 @@ class Algorithm:
         # remove zero_scoring_projects from projects
         self.projects.difference_update(zero_scoring_projects)
 
-        return sorted(self.projects, key=lambda p: p.effective_score, reverse=True)
+        projects_list = list(self.projects)
+        shuffle(projects_list)
+        return projects_list
+        # return sorted(self.projects, key=lambda p: p.effective_score, reverse=True)
 
     @staticmethod
     def sort_skills_of_k_projects_desc(top_k_projects):
@@ -58,7 +61,9 @@ class Algorithm:
             for skill, level in project.skills.items():
                 skill_list.append((skill, level, project))
 
-        return sorted(skill_list, key=lambda s: s[1], reverse=True)
+        shuffle(skill_list)
+        return skill_list
+        # return sorted(skill_list, key=lambda s: s[1], reverse=True)
 
     def find_fitting_person(self, skill):
         available_people = self.people.mat.loc[self.available_people_indicator]
@@ -72,16 +77,16 @@ class Algorithm:
         chosen_person_name = relevant_people.index[rand_idx]
         return self.people.name_to_person(chosen_person_name)
 
-    def set_working_people(self, project):
+    def set_available_people(self, project, value):
         for person in project.contributors_set:
             self.available_people_indicator[person.idx] = False
 
-    def calculate(self, top_k=3, iters=2):
+    def calculate(self, top_k=1, iters=10):
         self.schedule = []
         self.time = 0
 
         while True:
-            print(f't={self.time:5d} | running projects: {len(self.running_projects)} | projects: {len(self.projects)} | score: {self.expected_score}')
+            print(f'{self.example} | t={self.time:5d} | running projects: {len(self.running_projects)} | projects: {len(self.projects)} | score: {self.expected_score}')
             self.update_ending_projects()
 
             sorted_projects = self.sort_projects_by_effective_score_desc()  # also remove 0 scores
@@ -99,6 +104,7 @@ class Algorithm:
                     if person is None:
                         continue
                     skill[2].assign_role(person, skill[0])
+                    self.available_people_indicator[person.idx] = False # set as unavailable
 
                 for project in top_k_projects:
                     if project.is_full():
@@ -108,11 +114,10 @@ class Algorithm:
                         self.schedule.append(project)
                         self.running_projects.add(project)
 
-                        self.set_working_people(project)
                         project.apply_learning()
                         self.projects.remove(project)
                     else:
-                        # print('\tproject is not full')
+                        self.set_available_people(project, True) # set as available again
                         project.clean()
 
             if added_projects_count > 0:
@@ -129,7 +134,7 @@ def main():
     parser.add_argument("-e", "--example", help="Example Letter", type=str)
     args = parser.parse_args()
 
-    example = 'e' # args.example
+    example = 'c' # args.example
 
     people_dict, projects_dict, skills_set = load_example(example)
 

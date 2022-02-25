@@ -67,6 +67,7 @@ def load_file(file_name):
             contributors_dict[cont_name] = skills_dict
 
         # projects
+        dropped_projects_count = 0
         for p in range(projects_num):
             project_first_line = f.readline().rstrip('\n').split(' ')
             project_name, project_days, project_score, project_best_before, project_number_of_roles = \
@@ -81,14 +82,18 @@ def load_file(file_name):
 
                 project_skills_dict[skill_name] = skill_level
 
-            # append project
-            projects_dict[project_name] = {
-                'days': project_days,
-                'score': project_score,
-                'best_before': project_best_before,
-                'skills': project_skills_dict
-            }
+            if project_number_of_roles != len(project_skills_dict):
+                dropped_projects_count += 1
+            else:
+                # append project
+                projects_dict[project_name] = {
+                    'days': project_days,
+                    'score': project_score,
+                    'best_before': project_best_before,
+                    'skills': project_skills_dict
+                }
 
+    print(f'projects_num={projects_num} | dropped_projects_count={dropped_projects_count} | len(projects_dict)={len(projects_dict)}')
     return contributors_dict, projects_dict, skills_set
 
 
