@@ -76,7 +76,7 @@ class Algorithm:
                     person = self.find_fitting_person(skill)
                     if person is None:
                         continue
-                    skill[2].add_person(person, skill[0])
+                    skill[2].assign_role(person, skill[0])
 
                 for project in top_k_projects:
                     if project.is_full():
@@ -84,7 +84,7 @@ class Algorithm:
                         self.running_projects.add(project)
 
                         self.set_working_people(project)
-                        project.add_one_to_peoples_skills()
+                        project.apply_learning()
                         self.projects.remove(project)
                     else:
                         project.clean()

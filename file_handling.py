@@ -73,20 +73,20 @@ def load_file(file_name):
                 project_first_line[0], int(project_first_line[1]), int(project_first_line[2]), \
                 int(project_first_line[3]), int(project_first_line[4])
 
-            # project's roles
-            project_roles_list = []
+            # project's skills (roles)
+            project_skills_dict = {}
             for r in range(project_number_of_roles):
-                role_line = f.readline().rstrip('\n').split(' ')
-                skill_name, skill_level = role_line[0], int(role_line[1])
+                skills_line = f.readline().rstrip('\n').split(' ')
+                skill_name, skill_level = skills_line[0], int(skills_line[1])
 
-                project_roles_list.append((skill_name, skill_level))
+                project_skills_dict[skill_name] = skill_level
 
             # append project
             projects_dict[project_name] = {
                 'days': project_days,
                 'score': project_score,
                 'best_before': project_best_before,
-                'roles': project_roles_list
+                'skills': project_skills_dict
             }
 
     return contributors_dict, projects_dict, skills_set
